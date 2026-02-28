@@ -1,0 +1,67 @@
+{% extends 'base1.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Verification Failed" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-20 px-4 bg-soft-white" 
+     style="background: linear-gradient(135deg, #fffafa 0%, #f9fbf9 100%);">
+    
+    <div class="max-w-md w-full bg-white/95 backdrop-blur-md p-12 rounded-[3.5rem] border border-red-100 shadow-2xl text-center space-y-10 fade-in-up">
+        
+        <div class="w-28 h-28 bg-red-50 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
+            <div class="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center shadow-xl shadow-red-500/20 transition-transform hover:scale-110">
+                <i class="fa-solid fa-circle-xmark text-4xl text-white"></i>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h2 class="text-3xl font-bold text-red-600 tracking-tight">
+                {% trans "Access" %} <span class="text-earth-brown">{% trans "Denied" %}</span>
+            </h2>
+            <div class="h-1.5 w-16 bg-red-200 mx-auto rounded-full"></div>
+            <p class="text-sm text-gray-500 font-medium leading-relaxed px-4">
+                {% trans "The verification token provided is either invalid or has surpassed the 10-minute security window." %}
+            </p>
+        </div>
+
+        <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-left flex gap-4">
+            <i class="fa-solid fa-shield-virus text-red-400 mt-1"></i>
+            <div class="space-y-1">
+                <h4 class="text-[11px] font-bold text-red-600 uppercase tracking-widest">{% trans "Security Protocol" %}</h4>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                    {% trans "Unverified stakeholder accounts are automatically purged after multiple failed authentication attempts." %}
+                </p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <a href="{% url 'accounts:signup' %}" 
+               class="btn-glow w-full bg-earth-brown text-white font-bold py-5 rounded-2xl uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-black transition-all shadow-lg active:scale-95">
+                <i class="fa-solid fa-rotate-left"></i> {% trans "Restart Registration" %}
+            </a>
+            
+            <a href="{% url 'landing' %}" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] hover:text-primary-green transition-colors">
+                {% trans "Return to Value Chain Home" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ensure styles match base design system */
+    .fade-in-up { 
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+    
+    @keyframes fadeInUp { 
+        from { opacity: 0; transform: translateY(30px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Red button variant for errors */
+    .bg-earth-brown { background-color: var(--earth-brown); }
+    .text-earth-brown { color: var(--earth-brown); }
+</style>
+{% endblock %}

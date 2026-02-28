@@ -1,0 +1,249 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Smart Agricultural Value Chain" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Hero Section --- */
+    .hero {
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        padding: 0 8%;
+        background: linear-gradient(135deg, #fdfdfd 0%, #e8f5e9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        flex: 1;
+        z-index: 2;
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem;
+        line-height: 1.2;
+        color: var(--earth-brown);
+        margin-bottom: 20px;
+    }
+
+    .hero-content h1 span {
+        color: var(--primary-green);
+        position: relative;
+    }
+
+    .hero-content p {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 35px;
+        max-width: 600px;
+    }
+
+    .hero-btns {
+        display: flex;
+        gap: 20px;
+    }
+
+    .btn-outline {
+        padding: 12px 30px;
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .hero-image {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        position: relative;
+    }
+
+    .hero-image img {
+        width: 100%;
+        max-width: 500px;
+        filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* --- Vision Section --- */
+    .section-padding { padding: 100px 8%; }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-title h2 {
+        font-size: 2.5rem;
+        color: var(--primary-green);
+        margin-bottom: 10px;
+    }
+
+    .vision-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: center;
+    }
+
+    .vision-text h3 { font-size: 1.8rem; margin-bottom: 20px; }
+    .vision-text p { line-height: 1.8; color: #666; margin-bottom: 20px; }
+
+    /* --- Features Grid --- */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+
+    .feature-card {
+        padding: 40px;
+        text-align: center;
+        background: #fff;
+        border-radius: 20px;
+        transition: var(--transition);
+        border: 1px solid #eee;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border-color: var(--leaf-green);
+    }
+
+    .feature-card i {
+        font-size: 3rem;
+        color: var(--primary-green);
+        margin-bottom: 25px;
+    }
+
+    .feature-card h4 { margin-bottom: 15px; font-size: 1.3rem; }
+    .feature-card p { color: #777; font-size: 0.95rem; }
+
+    /* --- Stats Section --- */
+    .stats-bar {
+        background: var(--primary-green);
+        padding: 50px 8%;
+        display: flex;
+        justify-content: space-around;
+        color: white;
+        text-align: center;
+    }
+
+    .stat-item h2 { font-size: 2.5rem; }
+    .stat-item p { opacity: 0.8; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>{% trans "Empowering the" %} <span>{% trans "Millet Ecosystem" %}</span> {% trans "with AI" %}</h1>
+        <p>{% trans "A unified digital value chain platform connecting farmers to buyers with smart price prediction and demand forecasting tools." %}</p>
+        <div class="hero-btns">
+            <a href="{% url 'accounts:signup' %}" class="btn-glow">{% trans "Get Started" %}</a>
+            <a href="#features" class="btn-outline">{% trans "Learn More" %}</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="https://cdn-icons-png.flaticon.com/512/2328/2328966.png" alt="{% trans 'Agriculture AI' %}">
+    </div>
+</section>
+
+<div class="stats-bar">
+    <div class="stat-item">
+        <h2>95%</h2>
+        <p>{% trans "Price Accuracy" %}</p>
+    </div>
+    <div class="stat-item">
+        <h2>10+</h2>
+        <p>{% trans "Millet Varieties" %}</p>
+    </div>
+    <div class="stat-item">
+        <h2>{% trans "Direct" %}</h2>
+        <p>{% trans "Buyer Connect" %}</p>
+    </div>
+    <div class="stat-item">
+        <h2>{% trans "AI" %}</h2>
+        <p>{% trans "Demand Forecast" %}</p>
+    </div>
+</div>
+
+<section class="section-padding vision-grid" id="vision">
+    <div class="vision-img">
+        <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=600" style="width: 100%; border-radius: 20px;" alt="{% trans 'Farm' %}">
+    </div>
+    <div class="vision-text">
+        <h3>{% trans "Bridging the Gap Between Field & Market" %}</h3>
+        <p>{% trans "The Millets Value Chain Platform (MVCP) addresses the critical issue of price volatility and middleman intervention in millet farming." %}</p>
+        <p>{% trans "By leveraging" %} <strong>{% trans "Machine Learning Regression" %}</strong>, {% trans "we provide farmers with suggested market prices, helping them avoid underpricing and maximize profits." %}</p>
+        <ul style="list-style: none; color: var(--primary-green); font-weight: 600;">
+            <li><i class="fa-solid fa-circle-check"></i> {% trans "Real-time Market Insights" %}</li>
+            <li><i class="fa-solid fa-circle-check"></i> {% trans "6-Month Demand Forecasting" %}</li>
+            <li><i class="fa-solid fa-circle-check"></i> {% trans "Secure Order Management" %}</li>
+        </ul>
+    </div>
+</section>
+
+<section class="section-padding" id="features" style="background: #f4f7f4;">
+    <div class="section-title">
+        <h2>{% trans "Platform Features" %}</h2>
+        <p>{% trans "Integrated tools designed for every stakeholder in the value chain" %}</p>
+    </div>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <h4>{% trans "Price Prediction" %}</h4>
+            <p>{% trans "Advanced ML models estimate the best market price for your Ragi, Jowar, or Bajra based on location and season." %}</p>
+        </div>
+        <div class="feature-card">
+            <i class="fa-solid fa-shop"></i>
+            <h4>{% trans "Smart Marketplace" %}</h4>
+            <p>{% trans "Buyers can browse fresh listings, filter by location, and place orders directly with verified farmers." %}</p>
+        </div>
+        <div class="feature-card">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+            <h4>{% trans "Demand Insights" %}</h4>
+            <p>{% trans "Visualize future demand trends using Time-Series analysis to plan your next harvest or purchase strategy." %}</p>
+        </div>
+        <div class="feature-card">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h4>{% trans "Secure Trading" %}</h4>
+            <p>{% trans "Role-based access control and admin monitoring ensure a spam-free, secure environment for all transactions." %}</p>
+        </div>
+        <div class="feature-card">
+            <i class="fa-solid fa-bell"></i>
+            <h4>{% trans "Real-time Alerts" %}</h4>
+            <p>{% trans "Stay updated with instant notifications on order status, price shifts, and buyer requests." %}</p>
+        </div>
+        <div class="feature-card">
+            <i class="fa-solid fa-language"></i>
+            <h4>{% trans "Multi-Language" %}</h4>
+            <p>{% trans "Available in English and Telugu to ensure accessibility for local farming communities." %}</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding" style="text-align: center;">
+    <div class="glass-card" style="padding: 60px; background: linear-gradient(rgba(46,125,50,0.05), rgba(46,125,50,0.1));">
+        <h2>{% trans "Ready to transform your harvest?" %}</h2>
+        <p style="margin: 20px 0 35px;">{% trans "Join the next generation of digital millet farming today." %}</p>
+        <a href="{% url 'accounts:signup' %}" class="btn-glow" style="padding: 15px 40px !important; font-size: 1.1rem;">{% trans "Register Now" %}</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base1.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Value Chain Access" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-24 px-4 relative overflow-hidden" 
+     style="background: linear-gradient(135deg, #f9fbf9 0%, #e8f5e9 100%);">
+    
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-green/5 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-leaf-green/10 rounded-full blur-[120px] pointer-events-none animate-bounce" style="animation-duration: 10s;"></div>
+
+    <div class="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-2xl p-10 rounded-[2.5rem] border border-white/50 shadow-2xl transition-all hover:shadow-primary-green/10 fade-in-up">
+        
+        <div class="text-center">
+            <div class="w-24 h-24 bg-primary-green/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary-green/20 transition-transform hover:rotate-12 shadow-inner">
+                <i class="fa-solid fa-seedling text-4xl text-primary-green"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-primary-green tracking-tight">
+                {% trans "Stakeholder" %} <span class="text-earth-brown">{% trans "Portal" %}</span>
+            </h2>
+            <p class="mt-3 text-[11px] font-bold text-gray-500 uppercase tracking-[0.3em]">
+                {% trans "Secure Access to Value Chain" %}
+            </p>
+        </div>
+        
+        {% if messages %}
+        <div class="space-y-3">
+            {% for message in messages %}
+            <div id="alert-box-{{ forloop.counter }}" 
+                 class="{% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-700{% else %}bg-green-50 border-green-200 text-green-700{% endif %} border p-4 rounded-2xl flex justify-between items-center animate-pulse">
+                <p class="text-[10px] font-bold uppercase tracking-widest">
+                    <i class="{% if message.tags == 'error' %}fa-solid fa-circle-exclamation{% else %}fa-solid fa-circle-check{% endif %} mr-2"></i> 
+                    {{ message }}
+                </p>
+                <button onclick="this.parentElement.remove()" class="opacity-50 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form class="mt-8 space-y-6" method="POST">
+            {% csrf_token %}
+            <div class="space-y-5">
+                <div class="relative group">
+                    <i class="fa-solid fa-id-badge absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-green transition-colors"></i>
+                    <input name="username" type="email" required placeholder="{% trans 'Stakeholder Email ID' %}"
+                           class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-green/50 focus:ring-4 focus:ring-primary-green/5 outline-none font-medium text-gray-800 placeholder-gray-400 transition-all">
+                </div>
+                
+                <div class="relative group">
+                    <i class="fa-solid fa-fingerprint absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-green transition-colors"></i>
+                    <input id="password" name="password" type="password" required placeholder="{% trans 'Access Key' %}"
+                           class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-green/50 focus:ring-4 focus:ring-primary-green/5 outline-none font-medium text-gray-800 placeholder-gray-400 transition-all">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between px-2">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="w-4 h-4 text-primary-green border-gray-300 rounded focus:ring-primary-green">
+                    <label for="remember" class="ml-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest cursor-pointer">
+                        {% trans "Remember Node" %}
+                    </label>
+                </div>
+                <a href="{% url 'accounts:password_reset' %}" class="text-[10px] font-bold text-gray-400 hover:text-primary-green transition uppercase tracking-widest underline decoration-dotted">
+                    {% trans "Lost Credentials?" %}
+                </a>
+            </div>
+
+            <button type="submit" 
+                    class="btn-glow w-full bg-primary-green text-white font-bold py-5 rounded-2xl uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-primary-green/20">
+                <i class="fa-solid fa-wheat-awn-circle-exclamation"></i> {% trans "Authorize Session" %}
+            </button>
+
+            <div class="text-center pt-4">
+                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
+                    {% trans "New Stakeholder?" %} 
+                    <a href="{% url 'accounts:signup' %}" class="text-primary-green hover:underline ml-1">
+                        {% trans "Join Value Chain" %}
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Custom Animations */
+    .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Responsive Overrides & Palette Sync */
+    .text-primary-green { color: var(--primary-green); }
+    .bg-primary-green { background-color: var(--primary-green); }
+    .border-primary-green { border-color: var(--primary-green); }
+    .text-earth-brown { color: var(--earth-brown); }
+
+    /* Fix for overlapping icons in certain browsers */
+    input::placeholder { font-size: 0.85rem; letter-spacing: normal; }
+</style>
+{% endblock %}

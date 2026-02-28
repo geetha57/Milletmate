@@ -1,0 +1,97 @@
+{% extends 'base1.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Stakeholder Profile" %} | {% trans "MilletChain" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-24 px-8 bg-soft-white">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-[2.5rem] p-10 shadow-xl border border-gray-50 flex flex-col md:flex-row items-center gap-10 fade-in-up">
+            <div class="relative group">
+                <div class="w-40 h-40 rounded-full border-4 border-leaf-green/30 overflow-hidden shadow-xl transition-transform hover:scale-105">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" class="w-full h-full object-cover" alt="{% trans 'Profile Picture' %}">
+                    {% else %}
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fa-solid fa-user-gear text-6xl text-gray-300"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <button class="absolute bottom-2 right-2 bg-primary-green text-white w-10 h-10 rounded-full border-4 border-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-camera text-xs"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 space-y-4 text-center md:text-left">
+                <div class="flex flex-wrap items-center gap-3 justify-center md:justify-start">
+                    <h1 class="text-3xl font-bold text-primary-green">{{ user.email }}</h1>
+                    <span class="px-4 py-1 bg-primary-green/10 text-primary-green text-[10px] font-black uppercase tracking-widest rounded-full border border-primary-green/20">
+                        <i class="fa-solid fa-tag mr-1"></i> {{ user.get_role_display }}
+                    </span>
+                    {% if user.is_verified %}
+                    <span class="px-4 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
+                        <i class="fa-solid fa-circle-check mr-1"></i> {% trans "Verified" %}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-400 font-medium text-sm">
+                    {% trans "Ecosystem Member since" %}: {{ user.date_joined|date:"F Y" }} | {% trans "Total Sessions" %}: {{ user.login_count }}
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+            <div class="md:col-span-2 space-y-8">
+                <div class="bg-white rounded-[2rem] p-8 shadow-lg border border-gray-50">
+                    <h3 class="text-lg font-bold text-primary-green mb-6 flex items-center gap-3">
+                        <i class="fa-solid fa-sliders text-leaf-green"></i> {% trans "Stakeholder Metadata" %}
+                    </h3>
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{% trans "Email Identity" %}</label>
+                                <input type="text" value="{{ user.email }}" disabled class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl font-medium text-gray-400">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{% trans "Value Chain Role" %}</label>
+                                <input type="text" value="{{ user.get_role_display }}" disabled class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl font-medium text-gray-400">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-glow bg-primary-green text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-primary-green/20 transition-all">
+                            {% trans "Update Metadata" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="bg-white rounded-[2rem] p-8 shadow-lg border border-gray-50">
+                    <h3 class="text-sm font-bold text-primary-green mb-6 uppercase tracking-widest">{% trans "Security Node" %}</h3>
+                    <div class="space-y-4">
+                        <a href="{% url 'accounts:password_reset' %}" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-leaf-green/10 transition-colors group">
+                            <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">{% trans "Reset Access" %}</span>
+                            <i class="fa-solid fa-key text-gray-300 group-hover:text-primary-green transition-colors"></i>
+                        </a>
+                        <a href="{% url 'accounts:logout' %}" class="flex items-center justify-between p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors group">
+                            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">{% trans "Kill Session" %}</span>
+                            <i class="fa-solid fa-power-off text-red-300 group-hover:text-red-600 transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base1.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Identity Verified" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-20 px-4 relative overflow-hidden" 
+     style="background: radial-gradient(circle at center, #f0fdf4 0%, #f9fbf9 100%);">
+    
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div class="absolute top-1/4 left-10 w-64 h-64 bg-primary-green/5 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-10 w-64 h-64 bg-leaf-green/10 rounded-full blur-[100px] animate-pulse"></div>
+    </div>
+
+    <div class="max-w-md w-full bg-white/90 backdrop-blur-2xl p-12 rounded-[3.5rem] border border-leaf-green/20 shadow-2xl text-center space-y-10 relative z-10 fade-in-up">
+        
+        <div class="relative mx-auto w-32 h-32">
+            <div class="absolute inset-0 bg-primary-green/20 rounded-full animate-ping opacity-25"></div>
+            <div class="relative w-full h-full bg-primary-green rounded-full flex items-center justify-center shadow-2xl shadow-primary-green/40">
+                <i class="fa-solid fa-check text-5xl text-white"></i>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h2 class="text-3xl font-bold text-primary-green tracking-tight">
+                {% trans "Identity" %} <span class="text-earth-brown">{% trans "Verified" %}</span>
+            </h2>
+            <div class="h-1.5 w-20 bg-leaf-green mx-auto rounded-full"></div>
+            <p class="text-sm text-gray-500 font-medium leading-relaxed px-4">
+                {% trans "Your credentials have been successfully validated through our secure SMTP protocol." %}  {% trans "Your digital node is now active in the" %} <strong>{% trans "Millet Value Chain Ecosystem" %}</strong>. 
+            </p>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-6 py-2 bg-gray-50 border border-gray-100 rounded-full">
+            <i class="fa-solid fa-shield-check text-primary-green text-xs"></i>
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{% trans "Access Level: Authorized User" %}</span>
+        </div>
+
+        <div class="space-y-6 pt-4">
+            <a href="{% url 'accounts:login' %}" 
+               class="btn-glow w-full bg-primary-green text-white font-bold py-5 rounded-2xl uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-4 active:scale-95 transition-all shadow-xl shadow-primary-green/20">
+                <i class="fa-solid fa-door-open"></i> {% trans "Enter Platform" %}
+            </a>
+            
+            <div class="flex flex-col items-center gap-2">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em]">
+                    {% trans "System Redirection in" %} <span id="timer" class="text-primary-green">5</span> {% trans "Seconds" %}
+                </p>
+                <div class="w-32 h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="progress" class="h-full bg-primary-green transition-all duration-1000 ease-linear" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    let timeLeft = 5;
+    const timerElement = document.getElementById('timer');
+    const progressBar = document.getElementById('progress');
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerElement.innerText = timeLeft;
+        progressBar.style.width = ((5 - timeLeft) / 5 * 100) + '%';
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            window.location.href = "{% url 'accounts:login' %}";
+        }
+    }, 1000);
+</script>
+{% endblock %}

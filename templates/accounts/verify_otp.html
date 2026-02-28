@@ -1,0 +1,84 @@
+{% extends 'base1.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Verify Access" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-20 px-4 relative overflow-hidden" 
+     style="background: linear-gradient(135deg, #f9fbf9 0%, #e8f5e9 100%);">
+    
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-primary-green/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-leaf-green/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="max-w-md w-full bg-white/90 backdrop-blur-2xl p-12 rounded-[3.5rem] border border-white/60 shadow-2xl text-center space-y-8 relative z-10 fade-in-up">
+        
+        <div class="relative mx-auto w-24 h-24">
+            <div class="w-full h-full bg-primary-green/10 rounded-3xl flex items-center justify-center border-2 border-dashed border-primary-green/30 transition-transform hover:scale-110">
+                <i class="fa-solid fa-envelope-circle-check text-4xl text-primary-green"></i>
+            </div>
+            <div class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-pulse">
+                <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <h2 class="text-3xl font-bold text-primary-green tracking-tight">
+                {% trans "Enter" %} <span class="text-earth-brown">{% trans "Token" %}</span>
+            </h2>
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
+                {% trans "Security code dispatched to your registered stakeholder node." %}
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+            <div class="bg-red-50 text-red-600 p-3 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-red-100 animate-bounce">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" class="space-y-8">
+            {% csrf_token %}
+            <div class="relative group">
+                <i class="fa-solid fa-key-skeleton absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-green transition-colors"></i>
+                <input name="otp" type="text" maxlength="6" required placeholder="· · · · · ·"
+                       class="w-full text-center text-3xl tracking-[0.4em] font-black py-5 bg-gray-50/50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-green focus:ring-4 focus:ring-primary-green/5 outline-none transition-all placeholder-gray-200 text-earth-brown">
+            </div>
+
+            <button type="submit" 
+                    class="btn-glow w-full bg-primary-green text-white font-bold py-5 rounded-2xl uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-primary-green/20">
+                <i class="fa-solid fa-unlock-keyhole"></i> {% trans "Validate Access" %}
+            </button>
+            
+            <div class="pt-2">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    {% trans "Code not received?" %} 
+                    <a href="#" class="text-primary-green font-black hover:underline decoration-dotted underline-offset-4 ml-1">
+                        {% trans "Retransmit Token" %}
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Design Sync & Animations */
+    .fade-in-up { 
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+    
+    @keyframes fadeInUp { 
+        from { opacity: 0; transform: translateY(30px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .text-primary-green { color: var(--primary-green); }
+    .bg-primary-green { background-color: var(--primary-green); }
+    .text-earth-brown { color: var(--earth-brown); }
+</style>
+{% endblock %}
