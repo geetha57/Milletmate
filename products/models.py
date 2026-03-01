@@ -17,7 +17,7 @@ class MilletProduct(models.Model):
         ('quintal', _('Quintal')),
     ]
 
-    farmer = models.ForeignKey(settings.AUTH_USER_MODEL, on_request=models.CASCADE, related_name='products')
+    farmer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')
     millet_type = models.CharField(_("Millet Type"), max_length=20, choices=MILLET_TYPES)
     quantity = models.DecimalField(_("Quantity"), max_digits=10, decimal_places=2)
     unit = models.CharField(_("Unit"), max_length=10, choices=UNIT_CHOICES, default='kg')
