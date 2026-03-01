@@ -1,0 +1,185 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "My Inventory" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Farmer Inventory Dashboard Styles --- */
+    .inventory-header {
+        background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
+        padding: 40px;
+        border-radius: 30px;
+        color: white;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 30px rgba(46, 125, 50, 0.15);
+    }
+
+    .stat-pill {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .listing-row {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .listing-row:hover {
+        transform: scale(1.01);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        border-color: var(--leaf-green);
+    }
+
+    .action-btn {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .status-active {
+        background: #e8f5e9;
+        color: #2E7D32;
+    }
+
+    .millet-icon-box {
+        width: 60px;
+        height: 60px;
+        background: #f8faf8;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #eef2ee;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-4 md:px-8 bg-soft-white">
+    <div class="max-w-6xl mx-auto">
+        
+        <div class="inventory-header flex flex-col md:flex-row justify-between items-center gap-6 fade-in-up">
+            <div class="space-y-2">
+                <h1 class="text-3xl font-bold tracking-tight">{% trans "Producer Inventory" %}</h1>
+                <p class="text-green-100 opacity-80 text-sm">{% trans "Manage your active listings and supply chain nodes." %}</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="stat-pill text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-70">{% trans "Total Stock" %}</p>
+                    <p class="text-xl font-black">{{ products.count }}</p>
+                </div>
+                <a href="{% url 'products:add_product' %}" class="bg-white text-primary-green px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-earth-brown hover:text-white transition-all shadow-xl">
+                    <i class="fa-solid fa-plus-circle"></i> {% trans "Add New Crop" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="space-y-4 fade-in-up">
+            {% if products %}
+                <div class="hidden md:grid grid-cols-6 px-8 mb-4 attribute-label">
+                    <div class="col-span-2">{% trans "Millet Variety" %}</div>
+                    <div>{% trans "Available Stock" %}</div>
+                    <div>{% trans "Price Point" %}</div>
+                    <div>{% trans "Node Status" %}</div>
+                    <div class="text-right">{% trans "Actions" %}</div>
+                </div>
+
+                {% for product in products %}
+                <div class="listing-row grid grid-cols-1 md:grid-cols-6 items-center gap-4">
+                    <div class="col-span-2 flex items-center gap-4">
+                        <div class="millet-icon-box">
+                            <i class="fa-solid fa-wheat-awn text-2xl text-primary-green"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-earth-brown text-lg">{{ product.get_millet_type_display }}</h4>
+                            <p class="text-xs text-gray-400 flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot"></i> {{ product.location }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-bold text-earth-brown">{{ product.quantity }} {{ product.get_unit_display }}</p>
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">{% trans "Total Inventory" %}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-black text-primary-green">₹{{ product.price }}</p>
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">{% trans "Per Unit" %}</p>
+                    </div>
+
+                    <div>
+                        <span class="status-active px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-primary-green/20">
+                            {% if product.is_available %}{% trans "Active" %}{% else %}{% trans "Sold Out" %}{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <a href="{% url 'products:edit_product' product.pk %}" class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white" title="{% trans 'Edit Listing' %}">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a href="{% url 'products:delete_product' product.pk %}" class="action-btn bg-red-50 text-red-600 hover:bg-red-600 hover:text-white" title="{% trans 'Remove Listing' %}">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+            {% else %}
+                <div class="bg-white/50 border-2 border-dashed border-gray-100 rounded-[3rem] p-20 text-center">
+                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-seedling text-4xl text-gray-200"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-400">{% trans "No Active Listings" %}</h3>
+                    <p class="text-sm text-gray-300 mb-8">{% trans "Initialize your first millet product to start trading." %}</p>
+                    <a href="{% url 'products:add_product' %}" class="btn-glow inline-flex bg-primary-green text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs">
+                        {% trans "Deploy First Node" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-up">
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{% trans "Price Trend" %}</p>
+                    <p class="text-sm font-bold text-earth-brown">{% trans "Stable Market" %}</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{% trans "Pending Orders" %}</p>
+                    <p class="text-sm font-bold text-earth-brown">0 {% trans "Shipments" %}</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{% trans "Farmer Rank" %}</p>
+                    <p class="text-sm font-bold text-earth-brown">{% trans "Elite Contributor" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

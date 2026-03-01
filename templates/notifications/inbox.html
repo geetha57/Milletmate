@@ -1,0 +1,158 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Security & Activity Inbox" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Notification Inbox UI --- */
+    .inbox-container {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 40px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.04);
+    }
+
+    .notification-node {
+        padding: 24px;
+        border-radius: 24px;
+        border: 1px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .notification-node:hover {
+        background: #f8faf8;
+        border-color: var(--leaf-green);
+        transform: translateX(10px);
+    }
+
+    .unread-node {
+        background: rgba(46, 125, 50, 0.03);
+        border-left: 4px solid var(--primary-green) !important;
+    }
+
+    .unread-indicator {
+        width: 10px;
+        height: 10px;
+        background: var(--primary-green);
+        border-radius: 50%;
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        box-shadow: 0 0 10px rgba(46, 125, 50, 0.4);
+    }
+
+    .icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .bg-order { background: #e8f5e9; color: #2e7d32; }
+    .bg-price { background: #fff8e1; color: #f57f17; }
+    .bg-system { background: #efebe9; color: #4e342e; }
+
+    .btn-clear {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #9ca3af;
+        transition: color 0.3s ease;
+    }
+
+    .btn-clear:hover { color: #dc2626; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-24 px-4 md:px-8 bg-soft-white">
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 fade-in-up">
+            <div>
+                <h1 class="text-3xl font-bold text-earth-brown">{% trans "Communication" %} <span class="text-primary-green">{% trans "Node" %}</span></h1>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">{% trans "Real-time Stakeholder Alerts & Protocols" %}</p>
+            </div>
+            {% if notifications %}
+            <a href="{% url 'notifications:clear_all' %}" class="btn-clear flex items-center gap-2">
+                <i class="fa-solid fa-trash-sweep"></i> {% trans "Purge All Data" %}
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="inbox-container p-6 md:p-10 fade-in-up">
+            <div class="space-y-4">
+                {% for notification in notifications %}
+                <a href="{% if notification.link %}{% url 'notifications:mark_as_read' notification.pk %}{% else %}#{% endif %}" 
+                   class="notification-node flex items-start gap-6 {% if not notification.is_read %}unread-node{% endif %} block">
+                    
+                    <div class="icon-box bg-{{ notification.notification_type }}">
+                        {% if notification.notification_type == 'order' %}
+                            <i class="fa-solid fa-cart-flatbed-suitcases text-xl"></i>
+                        {% elif notification.notification_type == 'price' %}
+                            <i class="fa-solid fa-chart-line-up text-xl"></i>
+                        {% else %}
+                            <i class="fa-solid fa-shield-halved text-xl"></i>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                                {{ notification.get_notification_type_display }}
+                            </span>
+                            <span class="text-[9px] text-gray-300">•</span>
+                            <span class="text-[9px] font-bold text-gray-400">{{ notification.created_at|timesince }} {% trans "ago" %}</span>
+                        </div>
+                        <h4 class="text-base font-bold text-earth-brown mb-1">{{ notification.title }}</h4>
+                        <p class="text-sm text-gray-500 leading-relaxed">{{ notification.message }}</p>
+                    </div>
+
+                    {% if not notification.is_read %}
+                        <div class="unread-indicator"></div>
+                    {% endif %}
+                </a>
+                {% empty %}
+                <div class="text-center py-20">
+                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-envelope-open text-3xl text-gray-200"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-400">{% trans "Communication Node Clear" %}</h3>
+                    <p class="text-xs text-gray-300 uppercase tracking-widest font-bold">{% trans "No active alerts in your current session" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-12 p-8 bg-earth-brown rounded-[2.5rem] text-white flex items-center justify-between fade-in-up">
+            <div class="flex items-center gap-6">
+                <i class="fa-solid fa-lock-shield text-3xl text-leaf-green opacity-40"></i>
+                <div>
+                    <h5 class="text-xs font-bold uppercase tracking-widest">{% trans "End-to-End Encryption" %}</h5>
+                    <p class="text-[10px] opacity-60 font-medium">{% trans "All stakeholder transmissions are secured via AES-256 protocols." %}</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-signature text-3xl opacity-20 hidden md:block"></i>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

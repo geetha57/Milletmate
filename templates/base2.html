@@ -1,96 +1,290 @@
+{% load static %}
 {% load i18n %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorer Command Center | Sikkim AI</title>
+    <title>{% trans "MilletChain AI" %} | {% block title %}{% endblock %}</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'primary-green': '#2E7D32',
+                'leaf-green': '#A5D6A7',
+                'earth-brown': '#4E342E',
+                'soft-white': '#F9FBF9',
+              }
+            }
+          }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Metamorphous&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Poppins', sans-serif; overflow: hidden; background-color: #fdfcf8; }
-        .logo-font { font-family: 'Metamorphous', cursive; }
-        .sidebar-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-link { background: #D32F2F !important; color: white !important; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2); }
-        
-        /* Sidebar Collapse Logic */
-        .sidebar-collapsed { width: 80px !important; }
-        .sidebar-collapsed .nav-text, .sidebar-collapsed .nav-header { display: none; }
-        .sidebar-collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
-        .sidebar-collapsed .logo-text { display: none; }
+        :root {
+            --primary-green: #2E7D32;
+            --leaf-green: #A5D6A7;
+            --earth-brown: #4E342E;
+            --soft-white: #F9FBF9;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { font-family: 'Poppins', sans-serif; background-color: var(--soft-white); color: var(--earth-brown); }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: #ffffff;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid #eee;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 25px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(46, 125, 50, 0.05);
+            color: var(--primary-green);
+            border-left-color: var(--primary-green);
+        }
+
+        .nav-item i { font-size: 1.1rem; width: 25px; }
+
+        /* --- Top Dashboard Bar --- */
+        .top-bar {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            margin-left: 280px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid #eee;
+            z-index: 999;
+        }
+
+        .content-area { margin-left: 280px; padding: 40px; min-height: 100vh; }
+
+        /* --- Notification Pulse --- */
+        .pulse-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* --- Language Switcher (Mirroring Base 1) --- */
+        .lang-dropdown {
+            position: relative;
+            cursor: pointer;
+            padding: 8px 15px;
+            background: #f8faf8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .lang-menu {
+            position: absolute;
+            top: 115%;
+            right: 0;
+            background: #ffffff;
+            border-radius: 15px;
+            min-width: 150px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+
+        .lang-dropdown:hover .lang-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .lang-option {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--earth-brown);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .lang-option:hover { background: var(--leaf-green); color: var(--primary-green); }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<body class="min-h-screen flex">
+<body>
 
-    <aside id="sidebar" class="w-64 bg-white border-r border-amber-100 h-screen flex flex-col sidebar-transition z-50 shrink-0 shadow-xl">
-        <div class="p-6 flex items-center gap-3 border-b border-amber-50 bg-orange-50/20">
-            <div class="relative w-10 h-10 bg-red-700 rounded-xl flex items-center justify-center text-white shadow-lg shrink-0">
-                <i class="fa-solid fa-dharmachakra text-xl animate-spin-slow"></i>
-            </div>
-            <div class="flex flex-col logo-text">
-                <span class="logo-font font-bold text-xs tracking-tighter text-red-800 uppercase">Sikkim <span class="text-amber-500">AI</span></span>
-                <span class="text-[8px] uppercase tracking-widest font-black text-gray-400">Tourism Hub</span>
-            </div>
-        </div>
-
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            {% if user.is_superuser %}
-                {% include "partials/sidebar_admin.html" %}
-            {% else %}
-                {% include "partials/sidebar_user.html" %}
-            {% endif %}
-
-            <div class="pt-4 mt-4 border-t border-amber-50">
-                <p class="nav-header text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-3">{% translate "Preferences" %}</p>
-                <a href="{% url 'profile_settings' %}" class="nav-item flex items-center gap-3 p-3.5 rounded-2xl text-gray-600 hover:bg-amber-50 transition-all font-bold text-xs {% if request.resolver_match.url_name == 'profile_settings' %}active-link{% endif %}">
-                    <i class="fa-solid fa-user-gear text-lg"></i> 
-                    <span class="nav-text">{% translate "Settings" %}</span>
-                </a>
-            </div>
-        </nav>
-
-        <div class="p-4 border-t border-amber-50">
-            <a href="{% url 'logout' %}" class="nav-item flex items-center justify-center gap-3 p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest">
-                <i class="fa-solid fa-power-off"></i> 
-                <span class="nav-text">{% translate "Logout" %}</span>
+    <aside class="sidebar">
+        <div class="p-8">
+            <a href="/" class="logo text-primary-green font-bold text-xl flex items-center gap-3">
+                <i class="fa-solid fa-wheat-awn"></i> {% trans "MilletChain" %}
             </a>
         </div>
+
+        <nav class="mt-2">
+            <a href="/" class="nav-item active">
+                <i class="fa-solid fa-house-chimney-window"></i> {% trans "Control Center" %}
+            </a>
+
+            {% if user.role == 'farmer' %}
+                <div class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{% trans "Farmer Operations" %}</div>
+                <a href="{% url 'products:my_listings' %}" class="nav-item">
+                    <i class="fa-solid fa-seedling"></i> {% trans "Crop Inventory" %}
+                </a>
+                <a href="{% url 'analytics:price_predictor' %}" class="nav-item">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> {% trans "Price Analytics" %}
+                </a>
+                <a href="{% url 'orders:incoming_requests' %}" class="nav-item">
+                    <i class="fa-solid fa-handshake-angle"></i> {% trans "Trade Requests" %}
+                </a>
+
+            {% elif user.role == 'buyer' %}
+                <div class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{% trans "Buyer Marketplace" %}</div>
+                <a href="{% url 'products:marketplace' %}" class="nav-item">
+                    <i class="fa-solid fa-shop"></i> {% trans "Browse Millets" %}
+                </a>
+                <a href="{% url 'orders:buyer_history' %}" class="nav-item">
+                    <i class="fa-solid fa-boxes-stacked"></i> {% trans "Procurement" %}
+                </a>
+
+            {% elif user.role == 'admin' %}
+                <div class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{% trans "Admin Protocols" %}</div>
+                <a href="{% url 'analytics:admin_analytics' %}" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i> {% trans "Global Insights" %}
+                </a>
+                <a href="{% url 'analytics:upload_dataset' %}" class="nav-item">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> {% trans "Neural Training" %}
+                </a>
+            {% endif %}
+
+            <div class="mt-8 px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{% trans "Support & Profile" %}</div>
+            <a href="{% url 'notifications:inbox' %}" class="nav-item">
+                <i class="fa-solid fa-envelope-open-text"></i> {% trans "Inbox" %}
+            </a>
+            
+            <form action="{% url 'accounts:logout' %}" method="post" class="mt-4 px-2">
+                {% csrf_token %}
+                <button type="submit" class="nav-item w-full border-none bg-transparent cursor-pointer text-red-500 hover:bg-red-50">
+                    <i class="fa-solid fa-power-off"></i> {% trans "Logout" %}
+                </button>
+            </form>
+        </nav>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="h-20 bg-white border-b border-amber-100 flex items-center justify-between px-8 shrink-0 z-40 shadow-sm">
-            <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-red-700 transition-all border border-amber-50">
-                <i class="fa-solid fa-bars-staggered text-xl"></i>
-            </button>
-            
-            <div class="flex items-center gap-6">
-                <div class="text-right hidden md:block">
-                    <p class="text-[10px] font-black text-red-700 uppercase leading-none">
-                        {% if user.is_superuser %}{% translate "ADMIN ACCESS" %}{% else %}{% translate "EXPLORER ACTIVE" %}{% endif %}
-                    </p>
-                    <p class="text-xs font-bold text-gray-800">{{ user.email }}</p>
-                </div>
-                <img src="https://ui-avatars.com/api/?name={{ user.email }}&background=D32F2F&color=fff" class="w-10 h-10 rounded-full border-2 border-white shadow-md" alt="Profile">
-            </div>
-        </header>
+    <header class="top-bar">
+        <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{% trans "User Node" %}:</span>
+            <span class="px-3 py-1 bg-primary-green/10 text-primary-green text-[10px] font-black rounded-lg uppercase border border-primary-green/20">
+                {{ user.role }}
+            </span>
+        </div>
 
-        <section class="flex-1 overflow-y-auto p-8 bg-[#fdfcf8]">
-            {% block content %}{% endblock %}
-        </section>
+        <div class="flex items-center gap-8">
+            <div class="lang-dropdown">
+                <i class="fa-solid fa-globe text-primary-green"></i>
+                <span class="text-[11px] font-black uppercase tracking-wider text-primary-green">
+                    {% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}
+                </span>
+                <div class="lang-menu">
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                        <button type="submit" name="language" value="en" class="lang-option w-full border-none bg-transparent cursor-pointer">English</button>
+                        <button type="submit" name="language" value="hi" class="lang-option w-full border-none bg-transparent cursor-pointer">Hindi</button>
+                        <button type="submit" name="language" value="te" class="lang-option w-full border-none bg-transparent cursor-pointer">Telugu</button>
+                    </form>
+                </div>
+            </div>
+
+            <a href="{% url 'notifications:inbox' %}" class="relative text-gray-400 hover:text-primary-green transition-colors">
+                <i class="fa-solid fa-bell text-xl"></i>
+                
+                {% if has_unread_notifications %}
+                    <span class="pulse-dot"></span>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold px-1 rounded-full">
+                        {{ unread_notifications_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <div class="flex items-center gap-3 border-l pl-8">
+                <div class="text-right hidden md:block">
+                    <p class="text-[10px] font-black text-earth-brown truncate w-32 uppercase tracking-tighter">{{ user.email }}</p>
+                    <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{% trans "Active Node" %}</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-green rounded-2xl flex items-center justify-center text-white font-black shadow-lg shadow-primary-green/20">
+                    {{ user.email|slice:":1"|upper }}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-area">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-8 p-5 rounded-2xl text-xs font-bold flex items-center gap-3 fade-in shadow-sm border
+                    {% if message.tags == 'success' %}bg-green-50 text-green-700 border-green-100{% else %}bg-red-50 text-red-700 border-red-100{% endif %}">
+                    <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %} text-lg"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
     </main>
 
-    <div class="fixed bottom-6 right-6 z-50">
-        <a href="{% url 'chatbot:chat_home' %}" class="w-14 h-14 bg-red-700 rounded-full flex items-center justify-center text-white shadow-2xl hover:scale-110 transition-transform border-4 border-white">
-            <i class="fa-solid fa-om text-2xl"></i>
-        </a>
-    </div>
-    
     <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('sidebar-collapsed');
-        }
+        /* Smooth Fade In for Dynamic Content */
+        document.addEventListener('DOMContentLoaded', () => {
+            const main = document.querySelector('.content-area');
+            main.style.opacity = '0';
+            main.style.transition = 'opacity 0.5s ease-in-out';
+            setTimeout(() => main.style.opacity = '1', 50);
+        });
     </script>
 </body>
 </html>

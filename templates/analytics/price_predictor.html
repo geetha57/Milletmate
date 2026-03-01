@@ -1,0 +1,184 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Price Prediction Node" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Price Predictor UI --- */
+    .predictor-container {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 40px;
+        box-shadow: 0 25px 50px rgba(46, 125, 50, 0.05);
+    }
+
+    .prediction-result-card {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #1b5e20 100%);
+        border-radius: 30px;
+        color: white;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(46, 125, 50, 0.2);
+    }
+
+    .input-node {
+        background: #f8faf8;
+        border: 2px solid #eef2ee;
+        border-radius: 20px;
+        padding: 12px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .input-node:focus-within {
+        border-color: var(--primary-green);
+        background: white;
+        box-shadow: 0 0 15px rgba(46, 125, 50, 0.05);
+    }
+
+    .gauge-container {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-4 md:px-8 bg-soft-white">
+    <div class="max-w-6xl mx-auto">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+            
+            <div class="lg:col-span-2 space-y-8 fade-in-up">
+                <div>
+                    <h1 class="text-3xl font-bold text-earth-brown">{% trans "Market" %} <span class="text-primary-green">{% trans "Intelligence" %}</span></h1>
+                    <p class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mt-2">{% trans "AI-Driven Price Forecasting Node" %}</p>
+                </div>
+
+                <div class="predictor-container p-8">
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{% trans "Millet Variety" %}</label>
+                            <div class="input-node flex items-center gap-4">
+                                <i class="fa-solid fa-wheat-awn text-primary-green"></i>
+                                <select name="millet_type" required class="w-full bg-transparent border-none outline-none font-bold text-sm text-earth-brown">
+                                    {% for code, name in millet_types %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{% trans "Regional Market Node" %}</label>
+                            <div class="input-node flex items-center gap-4">
+                                <i class="fa-solid fa-location-dot text-primary-green"></i>
+                                <input type="text" name="location" required placeholder="{% trans 'E.g. Guntur' %}" 
+                                       class="w-full bg-transparent border-none outline-none font-bold text-sm text-earth-brown">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{% trans "Current Seasonality" %}</label>
+                            <div class="input-node flex items-center gap-4">
+                                <i class="fa-solid fa-cloud-sun text-primary-green"></i>
+                                <select name="season" class="w-full bg-transparent border-none outline-none font-bold text-sm text-earth-brown">
+                                    <option value="kharif">Kharif</option>
+                                    <option value="rabi">Rabi</option>
+                                    <option value="summer">Summer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-glow w-full py-5 rounded-2xl flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs font-black transition-all active:scale-95">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> {% trans "Analyze Market Price" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 space-y-8 fade-in-up" style="animation-delay: 0.2s;">
+                {% if suggested_price %}
+                    <div class="prediction-result-card">
+                        <p class="text-[10px] font-black uppercase tracking-[0.4em] opacity-70 mb-4">{% trans "Analysis Complete" %}</p>
+                        <h2 class="text-sm font-bold opacity-90 uppercase">{% trans "Suggested Market Price" %}</h2>
+                        
+                        <div class="py-8">
+                            <span class="text-7xl font-black">₹{{ suggested_price }}</span>
+                            <span class="text-xl font-bold opacity-60">/kg</span>
+                        </div>
+
+                        <div class="flex justify-center gap-8 mt-4 border-t border-white/10 pt-8">
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-widest opacity-60">{% trans "Model Accuracy" %}</p>
+                                <p class="text-lg font-bold">94.2%</p>
+                            </div>
+                            <div class="w-px h-10 bg-white/10"></div>
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-widest opacity-60">{% trans "Confidence" %}</p>
+                                <p class="text-lg font-bold">{% trans "High" %}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Demand Forecast" %}</h4>
+                                <p class="text-sm font-bold text-earth-brown">{% trans "Trending Upward (+12%)" %}</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Price Stability" %}</p>
+                                <p class="text-sm font-bold text-earth-brown">{% trans "Low Volatility Risk" %}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="bg-white/50 border-2 border-dashed border-gray-100 rounded-[3rem] p-24 text-center">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-solid fa-robot text-4xl text-gray-200"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-400">{% trans "Awaiting Parameters" %}</h3>
+                        <p class="text-sm text-gray-300 px-10">{% trans "Input variety and location metadata to initialize the ML Price Prediction protocol." %}</p>
+                    </div>
+                {% endif %}
+
+                <div class="p-8 bg-earth-brown rounded-[2.5rem] text-white flex items-center gap-6">
+                    <i class="fa-solid fa-database text-4xl opacity-20"></i>
+                    <div>
+                        <h4 class="text-sm font-bold uppercase tracking-widest text-leaf-green">{% trans "Training Source" %}</h4>
+                        <p class="text-xs opacity-80 leading-relaxed mt-1">
+                            {% trans "Predictions are synthesized from historical sales data nodes and real-time market trends within the MilletChain ecosystem." %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Incoming Requests" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Farmer Request Management UI --- */
+    .request-hero {
+        background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+        padding: 50px 8%;
+        color: white;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 30px rgba(46, 125, 50, 0.1);
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 32px;
+        border: 1px solid #f0f0f0;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .request-card:hover {
+        transform: scale(1.01);
+        border-color: var(--leaf-green);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    }
+
+    .buyer-node {
+        background: #f8faf8;
+        border-radius: 20px;
+        padding: 15px;
+        border: 1px solid #eef2ee;
+    }
+
+    /* Status Badges */
+    .badge-protocol {
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-size: 9px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    .protocol-pending { background: #fffbeb; color: #b45309; }
+    .protocol-accepted { background: #f0fdf4; color: #15803d; }
+    .protocol-rejected { background: #fef2f2; color: #b91c1c; }
+
+    .action-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="request-hero">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+                <i class="fa-solid fa-handshake-angle text-leaf-green"></i> {% trans "Acquisition Requests" %}
+            </h1>
+            <p class="text-green-100 opacity-80 text-sm">{% trans "Review and authorize buyer procurement requests for your millet nodes." %}</p>
+        </div>
+        <div class="flex gap-4">
+            <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20">
+                <p class="text-[10px] font-black uppercase tracking-widest opacity-70">{% trans "Pending Validation" %}</p>
+                <p class="text-xl font-black">{{ orders.count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 pb-24">
+    <div class="space-y-6 fade-in-up">
+        {% if orders %}
+            {% for order in orders %}
+            <div class="request-card p-6 md:p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                <div class="flex items-center gap-6 flex-1 w-full">
+                    <div class="w-16 h-16 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green">
+                        <i class="fa-solid fa-wheat-awn text-3xl"></i>
+                    </div>
+                    <div>
+                        <span class="badge-protocol protocol-{{ order.status }} mb-2 inline-block">
+                            {{ order.get_status_display }}
+                        </span>
+                        <h3 class="text-xl font-bold text-earth-brown leading-tight">{{ order.product.get_millet_type_display }}</h3>
+                        <p class="text-xs text-gray-400 mt-1">
+                            <i class="fa-solid fa-user-tag mr-1"></i> {% trans "Buyer ID" %}: {{ order.buyer.email|truncatechars:20 }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-10 flex-[2] w-full">
+                    <div class="buyer-node">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Request Qty" %}</p>
+                        <p class="text-sm font-bold text-earth-brown">{{ order.quantity }} {{ order.product.get_unit_display }}</p>
+                    </div>
+                    <div class="buyer-node">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Total Capital" %}</p>
+                        <p class="text-sm font-black text-primary-green">₹{{ order.total_price }}</p>
+                    </div>
+                    <div class="buyer-node hidden md:block">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Request Date" %}</p>
+                        <p class="text-sm font-bold text-earth-brown">{{ order.created_at|date:"d M, Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+                    {% if order.status == 'pending' %}
+                        <a href="{% url 'orders:update_order_status' order.id 'accepted' %}" 
+                           class="action-circle bg-primary-green text-white hover:bg-black shadow-lg shadow-primary-green/20"
+                           title="{% trans 'Accept Request' %}">
+                            <i class="fa-solid fa-check"></i>
+                        </a>
+                        <a href="{% url 'orders:update_order_status' order.id 'rejected' %}" 
+                           class="action-circle bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
+                           title="{% trans 'Reject Request' %}">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    {% elif order.status == 'accepted' %}
+                        <a href="{% url 'orders:update_order_status' order.id 'completed' %}" 
+                           class="btn-glow bg-earth-brown text-white px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                            {% trans "Mark Completed" %}
+                        </a>
+                    {% else %}
+                        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic">
+                            {% trans "Protocol Finalized" %}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
+                <i class="fa-solid fa-envelope-open text-5xl text-gray-100 mb-6"></i>
+                <h3 class="text-xl font-bold text-gray-400">{% trans "No Pending Requests" %}</h3>
+                <p class="text-sm text-gray-300">{% trans "Currently no buyers are requesting your millet nodes." %}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

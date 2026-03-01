@@ -1,0 +1,220 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Millet Marketplace" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Advanced Marketplace UI Styles --- */
+    .marketplace-hero {
+        background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+        padding: 60px 8%;
+        color: white;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: -40px;
+    }
+
+    .filter-sidebar {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 25px;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 28px;
+        border: 1px solid #f0f0f0;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .product-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 25px 50px rgba(46, 125, 50, 0.12);
+        border-color: var(--leaf-green);
+    }
+
+    .img-container {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .product-card:hover .img-container img {
+        transform: scale(1.1);
+    }
+
+    .price-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--primary-green);
+        padding: 8px 15px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .millet-tag {
+        background: var(--leaf-green);
+        color: var(--primary-green);
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .search-input {
+        background: #f8faf8;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-green);
+        background: white;
+        box-shadow: 0 0 15px rgba(46, 125, 50, 0.1);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 100px 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="marketplace-hero">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="space-y-2">
+            <h1 class="text-4xl font-bold tracking-tight">{% trans "Digital Millet Marketplace" %}</h1>
+            <p class="text-green-100 opacity-90">{% trans "Direct from verified farmers to your doorstep." %}</p>
+        </div>
+        <div class="w-full md:w-96">
+            <form action="{% url 'products:marketplace' %}" method="GET" class="relative">
+                <input type="text" name="q" placeholder="{% trans 'Search by location or variety...' %}" 
+                       class="w-full py-4 pl-12 pr-4 rounded-2xl text-earth-brown focus:outline-none shadow-xl border-none">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-20">
+    <div class="flex flex-col lg:flex-row gap-10">
+        
+        <aside class="w-full lg:w-1/4">
+            <div class="filter-sidebar">
+                <h3 class="text-xl font-bold text-primary-green mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-filter-list"></i> {% trans "Refine Search" %}
+                </h3>
+                
+                <form action="{% url 'products:marketplace' %}" method="GET" class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{% trans "Millet Variety" %}</label>
+                        <select name="millet_type" class="w-full p-3 rounded-xl bg-gray-50 border border-gray-100 text-sm focus:ring-2 focus:ring-primary-green focus:outline-none">
+                            <option value="">{% trans "All Varieties" %}</option>
+                            {% for code, name in millet_types %}
+                            <option value="{{ code }}" {% if request.GET.millet_type == code %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{% trans "Location" %}</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                            <input type="text" name="location" value="{{ request.GET.location }}" placeholder="{% trans 'E.g. Guntur' %}" 
+                                   class="w-full p-3 pl-10 rounded-xl bg-gray-50 border border-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-glow w-full py-4 text-sm font-bold uppercase tracking-widest">
+                        {% trans "Apply Filters" %}
+                    </button>
+                    
+                    <a href="{% url 'products:marketplace' %}" class="block text-center text-xs font-bold text-gray-400 hover:text-red-500 transition uppercase tracking-widest">
+                        {% trans "Clear All" %}
+                    </a>
+                </form>
+            </div>
+        </aside>
+
+        <div class="w-full lg:w-3/4">
+            {% if products %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="img-container">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.get_millet_type_display }}">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600" alt="Default">
+                        {% endif %}
+                        <div class="price-badge">
+                            ₹{{ product.price }}/{{ product.unit }}
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="millet-tag">{{ product.get_millet_type_display }}</span>
+                            <span class="text-xs text-gray-400 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-calendar-check"></i> {{ product.harvest_date }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-earth-brown leading-tight">
+                            {{ product.quantity }} {{ product.get_unit_display }} {% trans "Available" %}
+                        </h3>
+                        
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fa-solid fa-location-dot text-primary-green"></i>
+                            <span>{{ product.location }}</span>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-primary-green text-xs font-bold">
+                                    {{ product.farmer.email|slice:":1"|upper }}
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">{% trans "Farmer Verified" %}</span>
+                            </div>
+                            <a href="{% url 'products:product_detail' product.pk %}" class="text-primary-green font-bold text-sm hover:underline">
+                                {% trans "View Details" %} <i class="fa-solid fa-arrow-right-long ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state glass-card">
+                <i class="fa-solid fa-seedling text-6xl text-leaf-green mb-6"></i>
+                <h2 class="text-2xl font-bold text-earth-brown">{% trans "No Millets Found" %}</h2>
+                <p class="text-gray-500 mt-2">{% trans "Try adjusting your filters or search terms to find available stock." %}</p>
+                <a href="{% url 'products:marketplace' %}" class="inline-block mt-8 text-primary-green font-bold underline">{% trans "Reset Search" %}</a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

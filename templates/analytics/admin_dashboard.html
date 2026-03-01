@@ -1,0 +1,201 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Admin Analytics Node" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Admin Dashboard UI --- */
+    .admin-hero {
+        background: linear-gradient(135deg, #1a2a1a 0%, var(--earth-brown) 100%);
+        padding: 60px 8%;
+        color: white;
+        border-radius: 0 0 60px 60px;
+        margin-bottom: -40px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 30px;
+        padding: 30px;
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border-color: var(--leaf-green);
+    }
+
+    .ml-status-box {
+        background: #f8faf8;
+        border-radius: 24px;
+        border: 1px solid #eef2ee;
+        padding: 20px;
+    }
+
+    .progress-bar-bg {
+        height: 8px;
+        background: #eee;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--primary-green);
+        border-radius: 10px;
+        transition: width 1.5s ease-in-out;
+    }
+
+    .action-pill {
+        background: var(--primary-green);
+        color: white !important;
+        padding: 12px 25px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        box-shadow: var(--neon-glow);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-hero">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="space-y-3">
+            <span class="px-4 py-1 bg-leaf-green/20 text-leaf-green text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-leaf-green/30">
+                {% trans "System Administrator" %}
+            </span>
+            <h1 class="text-4xl font-bold tracking-tight">{% trans "Ecosystem Analytics" %}</h1>
+            <p class="text-gray-400 text-sm">{% trans "Monitoring global millet value chain nodes and ML model integrity." %}</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'analytics:upload_dataset' %}" class="action-pill flex items-center gap-3">
+                <i class="fa-solid fa-cloud-arrow-up"></i> {% trans "Integrate Dataset" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-24">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 fade-in-up">
+        <div class="stat-card flex items-center gap-6">
+            <div class="w-16 h-16 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green text-3xl">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Total Chain Orders" %}</p>
+                <h2 class="text-3xl font-black text-earth-brown">{{ total_orders }}</h2>
+            </div>
+        </div>
+
+        <div class="stat-card flex items-center gap-6">
+            <div class="w-16 h-16 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green text-3xl">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Avg Market Price" %}</p>
+                <h2 class="text-3xl font-black text-earth-brown">₹{{ avg_market_price|floatformat:2 }}</h2>
+            </div>
+        </div>
+
+        <div class="stat-card flex items-center gap-6">
+            <div class="w-16 h-16 bg-primary-green/5 rounded-2xl flex items-center justify-center text-primary-green text-3xl">
+                <i class="fa-solid fa-wheat-awn"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Top Trending Millet" %}</p>
+                <h2 class="text-2xl font-black text-primary-green uppercase">{{ top_millet.millet_type|default:"N/A" }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 fade-in-up">
+        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold text-earth-brown mb-8 flex items-center gap-3">
+                <i class="fa-solid fa-microchip text-primary-green"></i> {% trans "ML Model Intelligence Metrics" %}
+            </h3>
+            
+            <div class="space-y-8">
+                {% for metric in metrics %}
+                <div class="ml-status-box">
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ metric.model_name }}</p>
+                            <h4 class="text-sm font-bold text-earth-brown">{% trans "Training Reliability" %}</h4>
+                        </div>
+                        <span class="text-lg font-black text-primary-green">{{ metric.accuracy_score }}%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: {{ metric.accuracy_score }}%"></div>
+                    </div>
+                    <p class="mt-4 text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                        <i class="fa-solid fa-clock-rotate-left mr-1"></i> {% trans "Last Trained" %}: {{ metric.last_trained|date:"M d, Y | H:i" }}
+                    </p>
+                </div>
+                {% empty %}
+                <div class="text-center py-10">
+                    <i class="fa-solid fa-triangle-exclamation text-3xl text-gray-200 mb-4"></i>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{% trans "No metrics data found" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold text-earth-brown mb-8 flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-primary-green"></i> {% trans "Node Activity Feed" %}
+            </h3>
+            
+            <div class="space-y-6">
+                <div class="flex items-start gap-4 p-4 border-l-4 border-primary-green bg-gray-50 rounded-r-2xl">
+                    <i class="fa-solid fa-database text-primary-green mt-1"></i>
+                    <div>
+                        <p class="text-xs font-bold text-earth-brown">{% trans "Dataset Overwritten" %}</p>
+                        <p class="text-[10px] text-gray-500">{% trans "User ID 101 uploaded 500 rows to Sales History Node." %}</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 border-l-4 border-leaf-green bg-gray-50 rounded-r-2xl">
+                    <i class="fa-solid fa-robot text-primary-green mt-1"></i>
+                    <div>
+                        <p class="text-xs font-bold text-earth-brown">{% trans "Model Re-calibration" %}</p>
+                        <p class="text-[10px] text-gray-500">{% trans "Price Predictor accuracy increased by 1.2% after training." %}</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 border-l-4 border-earth-brown bg-gray-50 rounded-r-2xl">
+                    <i class="fa-solid fa-user-plus text-earth-brown mt-1"></i>
+                    <div>
+                        <p class="text-xs font-bold text-earth-brown">{% trans "Stakeholder Ingress" %}</p>
+                        <p class="text-[10px] text-gray-500">{% trans "New Farmer Node verified in Andhra Pradesh region." %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 p-6 bg-earth-brown rounded-3xl text-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest opacity-60">{% trans "Database Status" %}</p>
+                        <h4 class="text-sm font-bold">{% trans "Operational / Secure" %}</h4>
+                    </div>
+                    <i class="fa-solid fa-shield-check text-2xl text-leaf-green"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

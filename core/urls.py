@@ -13,10 +13,10 @@ urlpatterns = [
     
     # App-Specific Routes
     path('accounts/', include('accounts.urls')),
-    # path('products/', include('products.urls')),
-    # path('orders/', include('orders.urls')),
-    # path('analytics/', include('analytics.urls')),
-    # path('notifications/', include('notifications.urls')),
+    path('products/', include('products.urls')),
+    path('orders/', include('orders.urls')),
+    path('analytics/', include('analytics.urls')),
+    path('notifications/', include('notifications.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 ]
 

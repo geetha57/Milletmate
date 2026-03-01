@@ -17,21 +17,24 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('role', 'admin') # Superusers are admins by default
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
-    # Agri-Tech Roles
+    # Millet Platform Roles
     ADMIN = 'admin'
     FARMER = 'farmer'
+    BUYER = 'buyer'
+    
     ROLE_CHOICES = [
-        (ADMIN, 'Administrator'),
-        (FARMER, 'Farmer/User'),
+        (ADMIN, 'Platform Administrator'),
+        (FARMER, 'Millet Producer (Farmer)'),
+        (BUYER, 'Millet Consumer (Buyer)'),
     ]
 
     username = None
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=FARMER)
-    profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     login_count = models.PositiveIntegerField(default=0)
 
@@ -41,7 +44,7 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return f"{self.email} ({self.role})"
+        return f"{self.email} [{self.role.upper()}]"
 
 class EmailOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

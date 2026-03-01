@@ -1,0 +1,165 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "My Procurement History" %} | {% trans "MilletChain AI" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Buyer Procurement UI --- */
+    .procurement-header {
+        background: linear-gradient(135deg, var(--earth-brown) 0%, #212121 100%);
+        padding: 50px 8%;
+        color: white;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 40px;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 28px;
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+        border-color: var(--leaf-green);
+    }
+
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-pending { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+    .status-accepted { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+    .status-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+    .status-completed { background: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; }
+
+    .millet-icon-procure {
+        width: 50px;
+        height: 50px;
+        background: #f8faf8;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="procurement-header">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+                <i class="fa-solid fa-boxes-stacked text-leaf-green"></i> {% trans "Procurement History" %}
+            </h1>
+            <p class="text-gray-400 text-sm">{% trans "Track your active acquisitions and value chain participation." %}</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="{% url 'products:marketplace' %}" class="btn-glow bg-primary-green text-white px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 shadow-xl">
+                <i class="fa-solid fa-store"></i> {% trans "Marketplace" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 pb-24">
+    <div class="grid grid-cols-1 gap-6 fade-in-up">
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                
+                <div class="flex items-center gap-6 flex-1">
+                    <div class="millet-icon-procure">
+                        <i class="fa-solid fa-wheat-awn text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Order Node" %} #{{ order.id }}</p>
+                        <h3 class="text-xl font-bold text-earth-brown">{{ order.product.get_millet_type_display }}</h3>
+                        <p class="text-xs text-gray-500 font-medium">
+                            <i class="fa-solid fa-calendar-day mr-1 text-primary-green"></i> {% trans "Requested on" %}: {{ order.created_at|date:"M d, Y" }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8 flex-[2]">
+                    <div>
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Quantity" %}</p>
+                        <p class="text-sm font-bold text-earth-brown">{{ order.quantity }} {{ order.product.get_unit_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Total Capital" %}</p>
+                        <p class="text-sm font-black text-primary-green">₹{{ order.total_price }}</p>
+                    </div>
+                    <div class="hidden md:block">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{% trans "Farmer Node" %}</p>
+                        <p class="text-sm font-bold text-earth-brown">{{ order.product.farmer.email|truncatechars:15 }}</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center md:items-end gap-3 min-w-[150px]">
+                    <span class="status-badge status-{{ order.status }}">
+                        {% if order.status == 'pending' %}<i class="fa-solid fa-clock-rotate-left mr-1"></i>{% endif %}
+                        {% if order.status == 'accepted' %}<i class="fa-solid fa-circle-check mr-1"></i>{% endif %}
+                        {{ order.get_status_display }}
+                    </span>
+                    <a href="{% url 'products:product_detail' order.product.id %}" class="text-[10px] font-bold text-primary-green uppercase tracking-widest hover:underline">
+                        {% trans "View Details" %} <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
+                <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-cart-flatbed-empty text-4xl text-gray-200"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-400">{% trans "No Active Procurement" %}</h3>
+                <p class="text-sm text-gray-300 mb-8 px-4">{% trans "Your digital acquisition history is currently empty." %}</p>
+                <a href="{% url 'products:marketplace' %}" class="btn-glow bg-primary-green text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs">
+                    {% trans "Browse Marketplace" %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-up">
+        <div class="p-6 bg-white rounded-3xl border border-gray-100 flex items-center gap-4">
+            <i class="fa-solid fa-shield-halved text-primary-green text-2xl"></i>
+            <div>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{% trans "Trust Level" %}</p>
+                <p class="text-sm font-bold text-earth-brown">{% trans "Verified Stakeholder" %}</p>
+            </div>
+        </div>
+        <div class="p-6 bg-white rounded-3xl border border-gray-100 flex items-center gap-4">
+            <i class="fa-solid fa-indian-rupee-sign text-primary-green text-2xl"></i>
+            <div>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{% trans "Capital Allocated" %}</p>
+                <p class="text-sm font-bold text-earth-brown">{% trans "Secure Transactions" %}</p>
+            </div>
+        </div>
+        <div class="p-6 bg-white rounded-3xl border border-gray-100 flex items-center gap-4">
+            <i class="fa-solid fa-truck-fast text-primary-green text-2xl"></i>
+            <div>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{% trans "Procurement Speed" %}</p>
+                <p class="text-sm font-bold text-earth-brown">{% trans "Optimized Node" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
