@@ -10,15 +10,14 @@ from django.conf import settings
 from django.db.models import Avg, Sum
 from .models import SalesHistory, MLModelMetric
 from products.models import MilletProduct
+from accounts.models import User
 
 # ==========================================
 # 🤖 ML MODEL INITIALIZATION
 # ==========================================
-# Load the model once when the server starts for high performance
 MODEL_PATH = os.path.join(settings.BASE_DIR, 'analytics', 'ml_models', 'millet_price_model.pkl')
 
 try:
-    # This loaded pipeline includes the Preprocessor + Random Forest Model
     trained_pipeline = joblib.load(MODEL_PATH)
 except Exception as e:
     trained_pipeline = None
@@ -29,23 +28,19 @@ except Exception as e:
 # ==========================================
 @login_required
 def price_predictor(request):
-    """
-    Protocol to predict market price using the trained Random Forest Pipeline.
-    Falls back to database averages if the .pkl file is missing.
-    """
+    global trained_pipeline # Fixed UnboundLocalError
+    
     suggested_price = None
     prediction_type = "AI Engine"
 
     if request.method == 'POST':
         millet_type = request.POST.get('millet_type')
         location = request.POST.get('location')
-        quantity = request.POST.get('quantity_kg', 500) # Default to 500 if blank
+        quantity = request.POST.get('quantity_kg', 500)
         season = request.POST.get('season', 'Kharif')
 
-        # 1. ATTEMPT REAL AI PREDICTION
         if trained_pipeline:
             try:
-                # Create DataFrame matching the Colab training schema
                 input_df = pd.DataFrame([{
                     "millet_type": millet_type.capitalize(),
                     "quantity_kg": float(quantity),
@@ -57,9 +52,9 @@ def price_predictor(request):
                 suggested_price = round(float(prediction), 2)
             except Exception as e:
                 print(f"Prediction Error: {e}")
-                trained_pipeline = None # Trigger fallback
-
-        # 2. FALLBACK: DATABASE REGRESSION SIMULATION
+                # Don't set global to None here to avoid affecting other users, 
+                # just fall back locally.
+        
         if suggested_price is None:
             prediction_type = "Historical Average"
             avg_price = SalesHistory.objects.filter(
@@ -76,22 +71,16 @@ def price_predictor(request):
     })
 
 # ==========================================
-# 📈 DEMAND FORECASTING (TIME SERIES)
+# 📈 DEMAND FORECASTING
 # ==========================================
 @login_required
 def demand_forecast(request):
-    """
-    Simple Time Series Forecast using Moving Averages of Sales History.
-    """
-    # Fetch sales trends grouped by month
     trends = SalesHistory.objects.values('month').annotate(
         total_qty=Sum('quantity_sold')
     ).order_by('month')
 
     months = [t['month'] for t in trends]
     quantities = [float(t['total_qty']) for t in trends]
-
-    # Simple Forecast: Moving average of the last 3 data nodes
     forecast_val = sum(quantities[-3:]) / 3 if len(quantities) >= 3 else 0
 
     return render(request, 'analytics/demand_forecast.html', {
@@ -101,27 +90,39 @@ def demand_forecast(request):
     })
 
 # ==========================================
-# 🛠️ ADMIN: ANALYTICS & DATASET MGMT
+# 🛠️ ADMIN: ANALYTICS DASHBOARD
 # ==========================================
 @login_required
 def admin_analytics(request):
-    """Command Center for Platform Data Integrity"""
     if request.user.role != 'admin':
         return redirect('landing')
 
-    context = {
-        'total_nodes': SalesHistory.objects.count(),
-        'avg_market_price': SalesHistory.objects.aggregate(Avg('price'))['price__avg'],
-        'top_millet': SalesHistory.objects.values('millet_type').annotate(
-            total_sales=Sum('quantity_sold')
-        ).order_by('-total_sales').first(),
-        'metrics': MLModelMetric.objects.all()
-    }
-    return render(request, 'analytics/admin_dashboard.html', context)
+    # Core Stats
+    total_orders = SalesHistory.objects.count()
+    avg_market_price = SalesHistory.objects.aggregate(Avg('price'))['price__avg']
+    top_millet = SalesHistory.objects.values('millet_type').annotate(
+        total_sales=Sum('quantity_sold')
+    ).order_by('-total_sales').first()
+
+    # ML Intelligence
+    metrics = MLModelMetric.objects.all()
+
+    # Dynamic Node Activity Feed (Real-time logs)
+    # Get 3 most recent users and 2 most recent crop listings
+    recent_users = User.objects.all().order_by('-id')[:3]
+    recent_crops = MilletProduct.objects.all().order_by('-created_at')[:2]
+
+    return render(request, 'analytics/admin_dashboard.html', {
+        'total_orders': total_orders,
+        'avg_market_price': avg_market_price,
+        'top_millet': top_millet,
+        'metrics': metrics,
+        'recent_users': recent_users,
+        'recent_crops': recent_crops
+    })
 
 @login_required
 def upload_dataset(request):
-    """Protocol to update the ML training dataset via CSV ingestion"""
     if request.user.role != 'admin':
         return redirect('landing')
 
@@ -129,9 +130,8 @@ def upload_dataset(request):
         csv_file = request.FILES['csv_file']
         decoded_file = csv_file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
-        next(io_string) # Skip CSV header
+        next(io_string) 
         
-        # Batch creation for database efficiency
         history_nodes = []
         for row in csv.reader(io_string, delimiter=','):
             history_nodes.append(SalesHistory(

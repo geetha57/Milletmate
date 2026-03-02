@@ -39,15 +39,30 @@
                 <p class="text-[10px] font-black text-gray-400 uppercase mb-2">{% trans "Top Market Trend" %}</p>
                 <h2 class="text-xl font-black text-primary-green uppercase">{{ trending_millet.millet_type }}</h2>
             </div>
+        {% elif user.role == 'admin' %}
+            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">{% trans "System Users" %}</p>
+                <h2 class="text-3xl font-black text-primary-green">{{ total_users }}</h2>
+            </div>
+            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">{% trans "Platform GMV" %}</p>
+                <h2 class="text-3xl font-black text-earth-brown">₹{{ total_platform_sales }}</h2>
+            </div>
+            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm border-l-4 border-l-primary-green">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">{% trans "ML Health" %}</p>
+                <h2 class="text-3xl font-black text-primary-green">{{ ml_metrics.0.accuracy_score }}%</h2>
+            </div>
         {% endif %}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div class="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
             <h3 class="text-sm font-black text-earth-brown uppercase tracking-widest mb-8">
-                {% if user.role == 'farmer' %}{% trans "Inventory Levels" %}{% else %}{% trans "Market Price Index" %}{% endif %}
+                {% if user.role == 'farmer' %}{% trans "Inventory Levels" %}{% elif user.role == 'buyer' %}{% trans "Market Price Index" %}{% else %}{% trans "Global Price Telemetry" %}{% endif %}
             </h3>
-            <canvas id="mainChart" height="200"></canvas>
+            <div class="h-[300px]">
+                <canvas id="mainChart"></canvas>
+            </div>
         </div>
 
         <div class="bg-earth-brown p-10 rounded-[2.5rem] text-white flex flex-col justify-between">
@@ -56,15 +71,17 @@
                 <h3 class="text-xl font-bold mb-4">{% trans "Intelligence Protocol" %}</h3>
                 <p class="text-sm opacity-70 leading-relaxed">
                     {% if user.role == 'farmer' %}
-                        {% trans "Run the Price Prediction model to optimize your crop valuation for the current season." %}
+                        {% trans "Optimize your crop valuation using the Price Prediction model for current seasonal data." %}
+                    {% elif user.role == 'buyer' %}
+                        {% trans "Secure procurement contracts by analyzing historical demand and price trends." %}
                     {% else %}
-                        {% trans "Analyze demand trends to secure the best procurement contracts." %}
+                        {% trans "Monitor neural network accuracy and update datasets to improve platform intelligence." %}
                     {% endif %}
                 </p>
             </div>
-            <a href="{% if user.role == 'farmer' %}{% url 'analytics:price_predictor' %}{% else %}{% url 'products:marketplace' %}{% endif %}" 
+            <a href="{% if user.role == 'farmer' %}{% url 'analytics:price_predictor' %}{% elif user.role == 'buyer' %}{% url 'products:marketplace' %}{% else %}{% url 'analytics:upload_dataset' %}{% endif %}" 
                class="mt-8 bg-primary-green text-center py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-primary-green transition-all">
-                {% trans "Initialize Analysis" %}
+                {% trans "Initialize Protocol" %}
             </a>
         </div>
     </div>
@@ -73,24 +90,28 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('mainChart').getContext('2d');
+    
     new Chart(ctx, {
-        type: '{% if user.role == "farmer" %}bar{% else %}line{% endif %}',
+        type: '{{ chart_type }}',
         data: {
-            labels: {{ user.role == 'farmer'|yesno:"stock_labels,price_labels"|safe }},
+            labels: {{ chart_labels|safe }},
             datasets: [{
-                label: '{% trans "Data Node Value" %}',
-                data: {{ user.role == 'farmer'|yesno:"stock_values,price_values"|safe }},
-                backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                label: '{% trans "Value" %}',
+                data: {{ chart_values|safe }},
+                backgroundColor: '{{ chart_type }}' === 'bar' ? 'rgba(46, 125, 50, 0.2)' : 'rgba(46, 125, 50, 0.05)',
                 borderColor: '#2E7D32',
                 borderWidth: 3,
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointBackgroundColor: '#2E7D32'
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, grid: { display: false } },
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f0f0f0' } },
                 x: { grid: { display: false } }
             }
         }

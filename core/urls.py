@@ -2,14 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import landing_view
+from core.views import landing_view, dashboard_view # Import both now
 
 urlpatterns = [
-    # Admin Panel
     path('admin/', admin.site.urls),
     
-    # Public Landing Page
+    # Core Routes
     path('', landing_view, name='landing'),
+    path('dashboard/', dashboard_view, name='dashboard'), # The Command Center URL
     
     # App-Specific Routes
     path('accounts/', include('accounts.urls')),
@@ -20,7 +20,6 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
 ]
 
-# Serving Media and Static files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

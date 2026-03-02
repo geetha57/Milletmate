@@ -13,6 +13,16 @@ django-crispy-forms==2.5
 crispy-bootstrap5==2025.6
 
 # -------------------------
+# Machine Learning (Python 3.10 Compatible)
+# -------------------------
+scikit-learn==1.7.2
+pandas==2.2.2
+numpy==1.26.4
+scipy==1.13.1
+joblib==1.4.2
+threadpoolctl==3.5.0
+
+# -------------------------
 # Environment / Config
 # -------------------------
 python-dotenv==1.2.1
@@ -21,7 +31,7 @@ python-dotenv==1.2.1
 # Image Processing & QR Codes
 # -------------------------
 pillow==12.1.0
-qrcode[pillow]==8.0
+qrcode==8.0
 
 # -------------------------
 # PDF Export
