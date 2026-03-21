@@ -11,20 +11,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- SECURITY ----------------
 # In production, keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-later')
-DEBUG = True  # Set to False in production
+DEBUG = False  # Set to False in production
 ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = ['*']
-
 CSRF_TRUSTED_ORIGINS = [
-    "https://welcoming-dedication-production.up.railway.app",
-    "http://welcoming-dedication-production.up.railway.app",
-    "https://welcoming-dedication-production.up.railway.app:8080"
+    "https://*.up.railway.app"
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
-USE_X_FORWARDED_PORT = True
 
 # ---------------- AUTH ----------------
 # Custom User Model to handle Farmer, Buyer, and Admin roles
