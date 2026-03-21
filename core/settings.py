@@ -51,9 +51,10 @@ SITE_ID = 1
 
 # ---------------- MIDDLEWARE ----------------
 MIDDLEWARE = [
+    'core.middleware.DisableCSRFCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # For multi-language support [cite: 2, 6]
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
