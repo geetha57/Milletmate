@@ -85,3 +85,4 @@ htmlcov/
 *.key
 secrets.json
 credentials.json
+myenv/
