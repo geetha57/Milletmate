@@ -17,20 +17,14 @@ ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.up.railway.app"
+    "https://welcoming-dedication-production.up.railway.app",
+    "http://welcoming-dedication-production.up.railway.app",
+    "https://welcoming-dedication-production.up.railway.app:8080"
 ]
 
-# Proxy fix (VERY IMPORTANT)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
-
-# Disable strict secure cookies for now (IMPORTANT)
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
-# Optional (safe)
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax'
+USE_X_FORWARDED_PORT = True
 
 # ---------------- AUTH ----------------
 # Custom User Model to handle Farmer, Buyer, and Admin roles
