@@ -11,16 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- SECURITY ----------------
 # In production, keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-later')
-DEBUG = False  # Set to False in production
+DEBUG = True  # Set to False in production
+DEBUG = True
 ALLOWED_HOSTS = ['*']
-#ALLOWED_HOSTS = ['*']
-#ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.up.railway.app"
-]
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
+CSRF_TRUSTED_ORIGINS = ["https://welcoming-dedication-production.up.railway.app"]
 
 # ---------------- AUTH ----------------
 # Custom User Model to handle Farmer, Buyer, and Admin roles
@@ -51,10 +46,9 @@ SITE_ID = 1
 
 # ---------------- MIDDLEWARE ----------------
 MIDDLEWARE = [
-    'core.middleware.DisableCSRFCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # For multi-language support [cite: 2, 6]
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
