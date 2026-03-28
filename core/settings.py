@@ -11,11 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- SECURITY ----------------
 # In production, keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-later')
-DEBUG = True  # Set to False in production
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+ALLOWED_HOSTS = ['.onrender.com']
 
-CSRF_TRUSTED_ORIGINS = ["https://welcoming-dedication-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
 
 # ---------------- AUTH ----------------
 # Custom User Model to handle Farmer, Buyer, and Admin roles
@@ -47,10 +46,11 @@ SITE_ID = 1
 # ---------------- MIDDLEWARE ----------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # For multi-language support [cite: 2, 6]
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # 👈 ADD THIS
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -134,3 +134,5 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # ---------------- DEFAULT ----------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
