@@ -163,11 +163,15 @@
                 {% for product in products %}
                 <div class="product-card">
                     <div class="img-container">
-                        {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.get_millet_type_display }}">
-                        {% else %}
-                        <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600" alt="Default">
-                        {% endif %}
+                        {% if product.get_millet_type_display == "Ragi" %}
+                        <img src="{% static 'images/ragi.jpeg' %}">
+{% elif product.get_millet_type_display == "Jowar" %}
+    <img src="{% static 'images/jowar.jpeg' %}">
+{% elif product.get_millet_type_display == "Bajra" %}
+    <img src="{% static 'images/bajra.jpeg' %}">
+{% else %}
+    <img src="{% static 'images/default.jpeg' %}">
+{% endif %}
                         <div class="price-badge">
                             ₹{{ product.price }}/{{ product.unit }}
                         </div>
