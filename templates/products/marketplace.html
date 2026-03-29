@@ -163,21 +163,22 @@
                 {% for product in products %}
                 <div class="product-card">
                     <div class="img-container">
-                        {% if product.get_millet_type_display == "Ragi" %}
-                        <img src="C:\Users\123ma\Downloads\millets-project-\static\images\ragi.jpeg">
-{% elif product.get_millet_type_display == "Jowar" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\jowar.jpeg">
-{% elif product.get_millet_type_display == "Bajra" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\bajra.jpeg">
-    {% if product.get_millet_type_display == "foxtail" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\foxtail.jpeg">
-    {% if product.get_millet_type_display == "kodo millet" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\kodo.jpeg">
-    {% if product.get_millet_type_display == "poroso" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\poroso.jpeg">
-    {% if product.get_millet_type_display == "little millet" %}
-    <img src="C:\Users\123ma\Downloads\millets-project-\static\images\little.jpeg">
-
+                        {% if product.get_millet_type_display %}
+    {% if product.get_millet_type_display == "Ragi" %}
+        <img src="{% static 'images/ragi.jpeg' %}">
+    {% elif product.get_millet_type_display == "Jowar" %}
+        <img src="{% static 'images/jowar.jpeg' %}">
+    {% elif product.get_millet_type_display == "Bajra" %}
+        <img src="{% static 'images/bajra.jpeg' %}">
+    {% elif product.get_millet_type_display == "Foxtail" %}
+        <img src="{% static 'images/foxtail.jpeg' %}">
+    {% elif product.get_millet_type_display == "Kodo" %}
+        <img src="{% static 'images/kodo.jpeg' %}">
+    {% elif product.get_millet_type_display == "Little" %}
+        <img src="{% static 'images/little.jpeg' %}">
+    {% else %}
+        <img src="{% static 'images/default.jpeg' %}">
+    {% endif %}
 {% else %}
     <img src="{% static 'images/default.jpeg' %}">
 {% endif %}
